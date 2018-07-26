@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+
+require 'json'
+require 'date'
+
+namespace = ENV['KUBECTL_PLUGINS_CURRENT_NAMESPACE'] || 'default'
+pods_json = `kubectl --namespace #{namespace} get pods -o json`
+pods_parsed = JSON.parse(pods_json)
+
+puts "Containers"
+
+data = Hash.new
+max_name_length = 0
+max_age = 0
+min_age = 0
+
+pods_parsed['items'].each { |pod|
+  name = pod['metadata']['name']
+  data[name] = {
+    'name' => name,
+    'containers' => []
+  }
+  pod["spec"]["containers"].each { |c|
+     data[name]['containers'].push(c["name"])
+  }
+} 
+
+if data.length > 0
+  puts ""
+  data.each { |name, val|
+    output = ""
+    output += val['name'] + ": ["
+    val['containers'].each { |c| 
+       output += c + " "
+    }
+    output += "]"
+    puts output
+  }
+else
+  puts "No pods"
+end

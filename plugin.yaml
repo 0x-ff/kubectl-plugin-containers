@@ -1,0 +1,5 @@
+name: "containers" 
+shortDesc: "Show containers list" 
+longDesc: ""                     
+example: ""
+command: "./containers"   
